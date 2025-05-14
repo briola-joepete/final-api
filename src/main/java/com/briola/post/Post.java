@@ -20,7 +20,7 @@ public class Post {
     @Column(nullable = false, updatable = false)
     private String author;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
@@ -34,7 +34,7 @@ public class Post {
         this.imageUrl = imageUrl;
         this.author = author;
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt; // Ensure updatedAt is never null
     }
 
     // Getters and Setters
@@ -89,7 +89,7 @@ public class Post {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        updatedAt = createdAt; // Set updatedAt to createdAt during persistence
     }
 
     @PreUpdate

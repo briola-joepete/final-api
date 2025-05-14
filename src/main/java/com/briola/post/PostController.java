@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,8 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(post.getCreatedAt()); // Ensure updatedAt is set to createdAt
         Post savedPost = postRepository.save(post);
         return new ResponseEntity<>(savedPost, HttpStatus.CREATED);
     }
@@ -40,5 +43,19 @@ public class PostController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Post post) {
+        return postRepository.findById(id)
+                .map(existingPost -> {
+                    existingPost.setContent(post.getContent());
+                    existingPost.setImageUrl(post.getImageUrl());
+                    existingPost.setAuthor(post.getAuthor());
+                    existingPost.setUpdatedAt(LocalDateTime.now()); // Update updatedAt timestamp
+                    Post updatedPost = postRepository.save(existingPost);
+                    return ResponseEntity.ok(updatedPost);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
